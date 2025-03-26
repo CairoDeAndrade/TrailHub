@@ -8,7 +8,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
-import com.restaurant.travel_counselor.authorization.screens.Login
+import com.restaurant.travel_counselor.authorization.login.LoginScreen
 import com.restaurant.travel_counselor.ui.theme.Travel_counselorTheme
 
 class MainActivity : ComponentActivity() {
@@ -28,16 +28,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Boot() {
     val navController = rememberNavController()
-
-    Login(onNavigateTo = {
-        navController.navigate(it)
-    }) { }
+    LoginScreen()
 }
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun BootPreview() {
     Travel_counselorTheme {
-        Login(onNavigateTo = {}) {}
+        LoginScreen()
     }
 }
