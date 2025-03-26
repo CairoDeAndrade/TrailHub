@@ -1,4 +1,4 @@
-package com.restaurant.travel_counselor.authorization.login
+package com.restaurant.travel_counselor.features.login
 
 
 data class LoginUser(

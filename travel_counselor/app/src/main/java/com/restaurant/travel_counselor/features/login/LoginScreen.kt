@@ -1,4 +1,4 @@
-package com.restaurant.travel_counselor.authorization.login
+package com.restaurant.travel_counselor.features.login
 
 
 import MyTextField
@@ -7,19 +7,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Flight
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -33,7 +24,7 @@ import com.restaurant.travel_counselor.shared.components.MyPasswordField
 import com.restaurant.travel_counselor.shared.components.TopBar
 
 @Composable
-fun LoginScreen() {
+fun LoginScreen(onNavigateTo: (String) -> Unit) {
     val loginViewModel: LoginViewModel = viewModel()
 
     Scaffold(
@@ -47,7 +38,7 @@ fun LoginScreen() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            LoginFields(loginViewModel)
+            LoginFields(loginViewModel, onNavigateTo)
         }
     }
 }
@@ -55,7 +46,7 @@ fun LoginScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginFields(loginViewModel: LoginViewModel) {
+fun LoginFields(loginViewModel: LoginViewModel, onNavigateTo: (String) -> Unit) {
     val loginState = loginViewModel.uiState.collectAsState()
     val ctx = LocalContext.current
 
@@ -77,6 +68,7 @@ fun LoginFields(loginViewModel: LoginViewModel) {
         onClick = {
             if (loginViewModel.login()) {
                 Toast.makeText(ctx, "Login successful", Toast.LENGTH_SHORT).show()
+                onNavigateTo("RegisterUserScreen")
             }
         }
     ) {
@@ -94,5 +86,5 @@ fun LoginFields(loginViewModel: LoginViewModel) {
 @Composable
 @Preview(showSystemUi = true, showBackground = true, device = "id:Galaxy Nexus")
 fun LoginScreenPreview() {
-    LoginScreen()
+    LoginScreen(onNavigateTo = {})
 }
