@@ -1,4 +1,4 @@
-package com.restaurant.travel_counselor.authorization.register
+package com.restaurant.travel_counselor.features.register
 
 import MyTextField
 import android.widget.Toast
@@ -24,7 +24,7 @@ import com.restaurant.travel_counselor.shared.components.TopBar
 
 
 @Composable
-fun RegisterUserScreen() {
+fun RegisterUserScreen(onNavigateTo: (String) -> Unit) {
     val registerUserViewModel: RegisterUserViewModel = viewModel()
 
     Scaffold(
@@ -39,14 +39,14 @@ fun RegisterUserScreen() {
             verticalArrangement = Arrangement.Center
 
         ) {
-            RegisterUserFields(registerUserViewModel)
+            RegisterUserFields(registerUserViewModel, onNavigateTo)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterUserFields(registerUserViewModel: RegisterUserViewModel) {
+fun RegisterUserFields(registerUserViewModel: RegisterUserViewModel, onNavigateTo: (String) -> Unit) {
     var registerUser = registerUserViewModel.uiState.collectAsState()
     val ctx = LocalContext.current
 
@@ -87,6 +87,7 @@ fun RegisterUserFields(registerUserViewModel: RegisterUserViewModel) {
                     ctx, "User registered",
                     Toast.LENGTH_SHORT
                 ).show()
+                onNavigateTo("MenuScreen")
             }
         }
     ) {
@@ -108,5 +109,5 @@ fun RegisterUserFields(registerUserViewModel: RegisterUserViewModel) {
 @Composable
 @Preview(showSystemUi = true, showBackground = true, device = "id:Galaxy Nexus")
 fun RegisterUserPreview() {
-    RegisterUserScreen()
+    RegisterUserScreen(onNavigateTo = {})
 }

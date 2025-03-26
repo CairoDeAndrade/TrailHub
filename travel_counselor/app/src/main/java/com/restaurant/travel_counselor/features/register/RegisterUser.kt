@@ -1,4 +1,4 @@
-package com.restaurant.travel_counselor.authorization.register
+package com.restaurant.travel_counselor.features.register
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
