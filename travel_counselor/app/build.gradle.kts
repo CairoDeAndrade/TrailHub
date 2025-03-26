@@ -41,7 +41,17 @@ android {
 
 dependencies {
     val nav_version = "2.8.9"
+    val lifecycle_version = "2.8.7"
+    val arch_version = "2.2.0"
+    val ComposeMaterial = "1.7.8"
+
     implementation("androidx.navigation:navigation-compose:$nav_version")
+    implementation("androidx.compose.material:material-icons-extended:$ComposeMaterial")
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
+    // ViewModel utilities for Compose
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
