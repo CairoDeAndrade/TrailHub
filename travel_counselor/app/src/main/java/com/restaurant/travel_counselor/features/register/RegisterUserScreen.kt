@@ -87,7 +87,7 @@ fun RegisterUserFields(registerUserViewModel: RegisterUserViewModel, onNavigateT
                     ctx, "User registered",
                     Toast.LENGTH_SHORT
                 ).show()
-                onNavigateTo("MenuScreen")
+                onNavigateTo("LoginScreen")
             }
         }
     ) {
