@@ -1,5 +1,4 @@
-package com.restaurant.travel_counselor.authorization.login
-
+package com.restaurant.travel_counselor.authorization.register
 
 import MyTextField
 import android.widget.Toast
@@ -7,19 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Flight
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -32,9 +22,10 @@ import com.restaurant.travel_counselor.shared.components.ErrorDialog
 import com.restaurant.travel_counselor.shared.components.MyPasswordField
 import com.restaurant.travel_counselor.shared.components.TopBar
 
+
 @Composable
-fun LoginScreen() {
-    val loginViewModel: LoginViewModel = viewModel()
+fun RegisterUserScreen() {
+    val registerUserViewModel: RegisterUserViewModel = viewModel()
 
     Scaffold(
         topBar = { TopBar() }
@@ -46,53 +37,76 @@ fun LoginScreen() {
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
+
         ) {
-            LoginFields(loginViewModel)
+            RegisterUserFields(registerUserViewModel)
         }
     }
 }
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginFields(loginViewModel: LoginViewModel) {
-    val loginState = loginViewModel.uiState.collectAsState()
+fun RegisterUserFields(registerUserViewModel: RegisterUserViewModel) {
+    var registerUser = registerUserViewModel.uiState.collectAsState()
     val ctx = LocalContext.current
 
     MyTextField(
-        label = "Username",
-        value = loginState.value.username,
-        onValueChange = loginViewModel::onUsernameChange
+        label = "User",
+        value = registerUser.value.user,
+        onValueChange = {
+            registerUserViewModel.onUserChange(it)
+        },
     )
-
+    MyTextField(
+        label = "E-mail",
+        value = registerUser.value.email,
+        onValueChange = {
+            registerUserViewModel.onEmailChange(it)
+        }
+    )
     MyPasswordField(
         label = "Password",
-        value = loginState.value.password,
-        errorMessage = loginState.value.validatePassword(),
-        onValueChange = loginViewModel::onPasswordChange
-    )
+        value = registerUser.value.password,
+        errorMessage = registerUser.value.validatePassord(),
+        onValueChange = {
+            registerUserViewModel.onPasswordChange(it)
+        })
+    MyPasswordField(
+        label = "Confirm password",
+        value = registerUser.value.confirmPassword,
+        errorMessage = registerUser.value.validateConfirmPassword(),
+        onValueChange = {
+            registerUserViewModel.onConfirmPassword(it)
+        })
 
     Button(
         modifier = Modifier.padding(top = 16.dp),
         onClick = {
-            if (loginViewModel.login()) {
-                Toast.makeText(ctx, "Login successful", Toast.LENGTH_SHORT).show()
+            if (registerUserViewModel.register()) {
+                Toast.makeText(
+                    ctx, "User registered",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     ) {
-        Text(text = "Login")
+        Text(text = "Register user")
     }
 
-    if (loginState.value.errorMessage.isNotBlank()) {
+    if (registerUser.value.errorMessage.isNotBlank()) {
         ErrorDialog(
-            error = loginState.value.errorMessage,
-            onDismissRequest = loginViewModel::clearErrorMessage
+            error = registerUser.value.errorMessage,
+            onDismissRequest = {
+                registerUserViewModel.cleanErrorMessage()
+            }
         )
     }
+
 }
+
 
 @Composable
 @Preview(showSystemUi = true, showBackground = true, device = "id:Galaxy Nexus")
-fun LoginScreenPreview() {
-    LoginScreen()
+fun RegisterUserPreview() {
+    RegisterUserScreen()
 }
