@@ -1,13 +1,14 @@
 package com.restaurant.travel_counselor.features.login
 
 import androidx.lifecycle.ViewModel
+import com.restaurant.travel_counselor.dao.UserDao
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
-class LoginViewModel : ViewModel() {
+class LoginViewModel(private val userDao: UserDao) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(LoginUser())
-    val uiState: StateFlow<LoginUser> = _uiState
+    private val _uiState = MutableStateFlow(LoginUserData())
+    val uiState: StateFlow<LoginUserData> = _uiState
 
     fun onUsernameChange(newUsername: String) {
         _uiState.value = _uiState.value.copy(username = newUsername)
@@ -50,4 +51,12 @@ class LoginViewModel : ViewModel() {
     fun clearErrorMessage() {
         _uiState.value = _uiState.value.copy(errorMessage = "")
     }
+
+    suspend fun checkCredentials(): Boolean {
+        val username = _uiState.value.username
+        val password = _uiState.value.password
+        val user = userDao.getUserByCredentials(username, password)
+        return user != null
+    }
+
 }

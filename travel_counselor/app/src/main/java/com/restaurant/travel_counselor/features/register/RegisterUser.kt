@@ -1,9 +1,13 @@
 package com.restaurant.travel_counselor.features.register
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.restaurant.travel_counselor.dao.UserDao
+import com.restaurant.travel_counselor.entities.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 data class RegisterUser(
     val user: String = "",
@@ -11,8 +15,9 @@ data class RegisterUser(
     val password: String = "",
     val confirmPassword: String = "",
     val errorMessage: String = "",
+    val isSaved: Boolean = false
 ) {
-    fun validatePassord(): String {
+    fun validatePassword(): String {
         if (password.isBlank()) {
             return "Password is required"
         }
@@ -33,26 +38,36 @@ data class RegisterUser(
         if (email.isBlank()) {
             throw Exception("Email is required")
         }
-        if (validatePassord().isNotBlank()) {
-            throw Exception(validatePassord())
+        if (validatePassword().isNotBlank()) {
+            throw Exception(validatePassword())
         }
         if (validateConfirmPassword().isNotBlank()) {
             throw Exception(validateConfirmPassword())
         }
     }
 
+    fun toUser(): User {
+        return User(
+            name = user,
+            password = password,
+            email = email
+        )
+    }
+
 }
 
-class RegisterUserViewModel : ViewModel() {
+class RegisterUserViewModel(
+    private val userDao: UserDao
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUser())
-    val uiState : StateFlow<RegisterUser> = _uiState.asStateFlow()
+    val uiState: StateFlow<RegisterUser> = _uiState.asStateFlow()
 
     fun onUserChange(user: String) {
         _uiState.value = _uiState.value.copy(user = user)
     }
 
-    fun onEmailChange(email : String) {
+    fun onEmailChange(email: String) {
         _uiState.value = _uiState.value.copy(email = email)
     }
 
@@ -60,24 +75,25 @@ class RegisterUserViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(password = password)
     }
 
-    fun onConfirmPassword(confirm : String) {
+    fun onConfirmPassword(confirm: String) {
         _uiState.value = _uiState.value.copy(confirmPassword = confirm)
     }
 
-    fun register(): Boolean  {
+    fun register() {
         try {
             _uiState.value.validateAllField()
-            return true
-            // register in database or invoke api
+            viewModelScope.launch {
+                userDao.insert(_uiState.value.toUser())
+                _uiState.value = _uiState.value.copy(isSaved = true)
+            }
         }
         catch (e: Exception) {
             _uiState.value = _uiState.value.copy(errorMessage = e.message ?: "Unknow error")
-            return false
         }
     }
 
-    fun cleanErrorMessage() {
-        _uiState.value = _uiState.value.copy(errorMessage = "")
+    fun cleanDisplayValues() {
+        _uiState.value = _uiState.value.copy(errorMessage = "", isSaved = false)
     }
 
 

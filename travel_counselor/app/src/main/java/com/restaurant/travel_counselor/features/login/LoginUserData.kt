@@ -1,7 +1,7 @@
 package com.restaurant.travel_counselor.features.login
 
 
-data class LoginUser(
+data class LoginUserData(
     val username: String = "",
     val password: String = "",
     val errorMessage: String = "",

@@ -1,7 +1,7 @@
 package com.restaurant.travel_counselor.features.login
 
 
-import MyTextField
+import RequiredTextField
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +17,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -27,17 +28,20 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.restaurant.travel_counselor.database.AppDatabase
+import com.restaurant.travel_counselor.features.register.RegisterUserViewModelFactory
 import com.restaurant.travel_counselor.shared.components.ErrorDialog
 import com.restaurant.travel_counselor.shared.components.MyPasswordField
-import com.restaurant.travel_counselor.shared.components.TopBar
+import kotlinx.coroutines.launch
 
 @Composable
 fun LoginScreen(onNavigateTo: (String) -> Unit) {
-    val loginViewModel: LoginViewModel = viewModel()
+    val context = LocalContext.current
+    val userDao = AppDatabase.getDatabase(context).userDao()
+    val factory = LoginViewModelFactory(userDao)
+    val loginViewModel: LoginViewModel = viewModel(factory = factory)
 
-    Scaffold(
-        topBar = { TopBar() }
-    ) {
+    Scaffold {
         Column(
             modifier = Modifier
                 .padding(it)
@@ -58,7 +62,7 @@ fun LoginFields(loginViewModel: LoginViewModel, onNavigateTo: (String) -> Unit) 
     val loginState = loginViewModel.uiState.collectAsState()
     val ctx = LocalContext.current
 
-    MyTextField(
+    RequiredTextField(
         label = "Username",
         value = loginState.value.username,
         onValueChange = loginViewModel::onUsernameChange
@@ -71,12 +75,22 @@ fun LoginFields(loginViewModel: LoginViewModel, onNavigateTo: (String) -> Unit) 
         onValueChange = loginViewModel::onPasswordChange
     )
 
+    val scope = rememberCoroutineScope()
+
     Button(
         modifier = Modifier.padding(top = 16.dp),
         onClick = {
             if (loginViewModel.login()) {
-                Toast.makeText(ctx, "Login successful", Toast.LENGTH_SHORT).show()
-                onNavigateTo("MenuScreen")
+                scope.launch {
+                    val isValidUser = loginViewModel.checkCredentials()
+                    if (isValidUser) {
+                        Toast.makeText(ctx, "Login successful", Toast.LENGTH_SHORT).show()
+                        onNavigateTo("MenuScreen")
+                    } else {
+                        Toast.makeText(ctx, "Invalid username or password", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
             }
         }
     ) {
@@ -88,10 +102,12 @@ fun LoginFields(loginViewModel: LoginViewModel, onNavigateTo: (String) -> Unit) 
     val annotatedText = buildAnnotatedString {
         append("Do not have an account? ")
         pushStringAnnotation(tag = "Register", annotation = "RegisterUserScreen")
-        withStyle(style = SpanStyle(
-            color = MaterialTheme.colorScheme.primary,
-            textDecoration = TextDecoration.Underline
-        )) {
+        withStyle(
+            style = SpanStyle(
+                color = MaterialTheme.colorScheme.primary,
+                textDecoration = TextDecoration.Underline
+            )
+        ) {
             append("Register now")
         }
         pop()

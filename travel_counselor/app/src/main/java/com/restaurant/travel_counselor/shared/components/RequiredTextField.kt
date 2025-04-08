@@ -9,7 +9,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
 
 @Composable
-fun MyTextField(
+fun RequiredTextField(
     label: String,
     value: String,
     onValueChange: (String) -> Unit
