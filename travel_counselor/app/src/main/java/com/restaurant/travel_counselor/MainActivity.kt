@@ -17,6 +17,7 @@ import com.restaurant.travel_counselor.features.menu.MenuScreen
 import com.restaurant.travel_counselor.features.newtrip.NewTripScreen
 import com.restaurant.travel_counselor.features.register.RegisterUserScreen
 import com.restaurant.travel_counselor.shared.components.TopBar
+import com.restaurant.travel_counselor.shared.enums.AppRouter
 import com.restaurant.travel_counselor.ui.theme.Travel_counselorTheme
 
 class MainActivity : ComponentActivity() {
@@ -44,26 +45,36 @@ fun Boot() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = "LoginScreen"
+        startDestination = AppRouter.LOGIN.route
     ) {
-        composable(route = "LoginScreen") {
+        composable(route = AppRouter.LOGIN.route) {
             LoginScreen(onNavigateTo = {
                 navController.navigate(it)
             })
         }
 
-        composable(route = "RegisterUserScreen") {
+        composable(route = AppRouter.REGISTER.route) {
             RegisterUserScreen(onNavigateTo = {
                 navController.navigate(it)
             })
         }
 
-        composable(route = "MenuScreen") {
+        composable(route = AppRouter.MENU.route) {
             MenuScreen(navController) {}
         }
 
-        composable(route = "NewTripScreen") {
-            NewTripScreen(onNavigateTo = { navController.navigate(it) })
+        composable(route = AppRouter.NEW_TRIP.route) {
+            NewTripScreen(
+                onNavigateTo = { navController.navigate(it) },
+                tripId = null
+            )
+        }
+
+        composable("new_trip/{tripId}") { backStackEntry ->
+            val tripId = backStackEntry.arguments?.getString("tripId")?.toIntOrNull()
+            if (tripId != null) {
+                NewTripScreen(onNavigateTo = { navController.navigate(it) }, tripId = tripId)
+            }
         }
 
     }

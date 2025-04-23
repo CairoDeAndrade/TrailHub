@@ -14,6 +14,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -21,17 +22,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.restaurant.travel_counselor.database.AppDatabase
+import com.restaurant.travel_counselor.entities.Trip
 import com.restaurant.travel_counselor.shared.components.MyDatePickerField
 import com.restaurant.travel_counselor.shared.components.RequiredNumberField
+import com.restaurant.travel_counselor.shared.enums.AppRouter
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewTripScreen(onNavigateTo: (String) -> Unit) {
-    val viewModel: NewTripViewModel = viewModel()
-    val uiState = viewModel.uiState.collectAsState()
-    val ctx = LocalContext.current
+fun NewTripScreen(onNavigateTo: (String) -> Unit, tripId: Int?) {
+    val context = LocalContext.current
+    val tripDao = AppDatabase.getDatabase(context).tripDao()
+    val factory = NewTripViewModelFactory(tripDao)
+    val newTripViewModel: NewTripViewModel = viewModel(factory = factory)
+    val uiState = newTripViewModel.uiState.collectAsState()
+
+    LaunchedEffect(tripId) {
+        if (tripId != null) {
+            newTripViewModel.loadTripById(tripId)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -49,12 +61,12 @@ fun NewTripScreen(onNavigateTo: (String) -> Unit) {
             RequiredTextField(
                 label = "Destination",
                 value = uiState.value.destination,
-                onValueChange = viewModel::onDestinationChange
+                onValueChange = newTripViewModel::onDestinationChange
             )
 
             TripTypeSelector(
                 selectedType = uiState.value.tripType,
-                onTypeChange = viewModel::onTripTypeChange
+                onTypeChange = newTripViewModel::onTripTypeChange
             )
 
             val sdf = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
@@ -69,31 +81,38 @@ fun NewTripScreen(onNavigateTo: (String) -> Unit) {
             MyDatePickerField(
                 label = "Start Date",
                 date = uiState.value.startDate,
-                onDateChange = viewModel::onStartDateChange,
+                onDateChange = newTripViewModel::onStartDateChange,
                 minDate = System.currentTimeMillis()
             )
 
             MyDatePickerField(
                 label = "End Date",
                 date = uiState.value.endDate,
-                onDateChange = viewModel::onEndDateChange,
+                onDateChange = newTripViewModel::onEndDateChange,
                 minDate = startDateMillis
             )
 
             RequiredNumberField(
                 label = "Budget (R$)",
                 value = uiState.value.budget,
-                onValueChange = viewModel::onBudgetChange
+                onValueChange = newTripViewModel::onBudgetChange
             )
 
-            Button(onClick = {
-                if (viewModel.saveTrip()) {
-                    Toast.makeText(ctx, "Saved", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(ctx, "Please fill all fields", Toast.LENGTH_SHORT).show()
+            Button(
+                onClick = {
+                    newTripViewModel.saveTrip(
+                        id = tripId ?: 0,
+                        onSuccess = {
+                            Toast.makeText(context, "Viagem salva com sucesso!", Toast.LENGTH_SHORT).show()
+                            onNavigateTo(AppRouter.MENU.route)
+                        },
+                        onError = {
+                            Toast.makeText(context, "Preencha todos os campos corretamente!", Toast.LENGTH_SHORT).show()
+                        }
+                    )
                 }
-            }) {
-                Text(text = "Save")
+            ) {
+                Text("Salvar")
             }
         }
     }
