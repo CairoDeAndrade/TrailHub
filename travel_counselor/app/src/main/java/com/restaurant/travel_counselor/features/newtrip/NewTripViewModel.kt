@@ -1,5 +1,7 @@
 package com.restaurant.travel_counselor.features.newtrip
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.restaurant.travel_counselor.dao.TripDao
@@ -9,10 +11,15 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class NewTripViewModel(
     private val tripDao: TripDao
 ) : ViewModel() {
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private val uiFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
 
     private val _uiState = MutableStateFlow(NewTripData())
     val uiState: StateFlow<NewTripData> = _uiState
@@ -44,6 +51,7 @@ class NewTripViewModel(
         _uiState.value = _uiState.value.copy(budget = newBudget)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun saveTrip(onSuccess: () -> Unit, onError: () -> Unit, id: Int) {
         val tripData = _uiState.value
         if (tripData.validateFields().isNotBlank()) {
@@ -51,12 +59,14 @@ class NewTripViewModel(
             return
         }
 
+        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
         val trip = Trip(
             id = id,
             destination = tripData.destination,
             tripType = tripData.tripType,
-            startDate = tripData.startDate,
-            endDate = tripData.endDate,
+            startDate = LocalDate.parse(tripData.startDate, formatter),
+            endDate = LocalDate.parse(tripData.endDate, formatter),
             budget = tripData.budget
         )
 
@@ -70,6 +80,7 @@ class NewTripViewModel(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun loadTripById(id: Int) {
         viewModelScope.launch {
             val trip = tripDao.findById(id)
@@ -77,8 +88,8 @@ class NewTripViewModel(
                 _uiState.value = NewTripData(
                     destination = it.destination,
                     tripType = it.tripType,
-                    startDate = it.startDate,
-                    endDate = it.endDate,
+                    startDate = it.startDate.format(uiFormatter),
+                    endDate = it.endDate.format(uiFormatter),
                     budget = it.budget
                 )
             }

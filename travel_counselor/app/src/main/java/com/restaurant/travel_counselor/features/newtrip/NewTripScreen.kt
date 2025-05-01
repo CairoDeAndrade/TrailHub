@@ -1,7 +1,9 @@
 package com.restaurant.travel_counselor.features.newtrip
 
 import RequiredTextField
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +32,7 @@ import com.restaurant.travel_counselor.shared.enums.AppRouter
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewTripScreen(onNavigateTo: (String) -> Unit, tripId: Int?) {

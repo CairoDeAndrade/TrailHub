@@ -4,18 +4,21 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.restaurant.travel_counselor.dao.TripDao
 import com.restaurant.travel_counselor.dao.UserDao
 import com.restaurant.travel_counselor.entities.Trip
 import com.restaurant.travel_counselor.entities.User
+import com.restaurant.travel_counselor.shared.utils.Converters
 
 @Database(
     entities = [User::class, Trip::class],
     version = 2,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
