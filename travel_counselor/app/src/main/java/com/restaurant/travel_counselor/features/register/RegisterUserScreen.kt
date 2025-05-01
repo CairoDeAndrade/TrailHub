@@ -122,11 +122,11 @@ fun RegisterUserFields(
             text = buildAnnotatedString {
                 append("Already have an account? ")
 
-                // Define a tag "login" para o clique
+
                 pushStringAnnotation(tag = "login", annotation = "LoginScreen")
                 withStyle(
                     style = SpanStyle(
-                        color = Color(0xFF1E88E5), // azul do Material
+                        color = Color(0xFF1E88E5),
                         textDecoration = TextDecoration.Underline,
                         fontSize = 16.sp
                     )

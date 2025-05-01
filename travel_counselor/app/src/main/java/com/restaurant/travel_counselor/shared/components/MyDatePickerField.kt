@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Icon
@@ -46,7 +47,7 @@ fun MyDatePickerField(
         label = { Text(text = label) },
         readOnly = true,
         modifier = Modifier
-            .fillMaxWidth()
+            .width(280.dp)
             .padding(top = 8.dp),
         trailingIcon = {
             Icon(

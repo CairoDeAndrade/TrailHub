@@ -35,7 +35,7 @@ class NewTripViewModel(
         _uiState.value = _uiState.value.copy(destination = newDestination)
     }
 
-    fun onTripTypeChange(newTripType: String) {
+    fun onTripTypeChange(newTripType: TripType) {
         _uiState.value = _uiState.value.copy(tripType = newTripType)
     }
 

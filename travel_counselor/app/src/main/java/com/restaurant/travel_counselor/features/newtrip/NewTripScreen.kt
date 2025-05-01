@@ -7,9 +7,12 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
@@ -18,14 +21,17 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.restaurant.travel_counselor.database.AppDatabase
-import com.restaurant.travel_counselor.entities.Trip
 import com.restaurant.travel_counselor.shared.components.MyDatePickerField
 import com.restaurant.travel_counselor.shared.components.RequiredNumberField
 import com.restaurant.travel_counselor.shared.enums.AppRouter
@@ -104,35 +110,64 @@ fun NewTripScreen(onNavigateTo: (String) -> Unit, tripId: Int?) {
                 }
             )
 
-            Button(
-                onClick = {
-                    newTripViewModel.saveTrip(
-                        id = tripId ?: 0,
-                        onSuccess = {
-                            Toast.makeText(context, "Viagem salva com sucesso!", Toast.LENGTH_SHORT).show()
-                            onNavigateTo(AppRouter.MENU.route)
-                        },
-                        onError = {
-                            Toast.makeText(context, "Preencha todos os campos corretamente!", Toast.LENGTH_SHORT).show()
-                        }
+            Row {
+                Button(
+                    onClick = { onNavigateTo(AppRouter.MENU.route) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.LightGray,
+                        contentColor = Color.DarkGray
                     )
+                ) {
+                    Text("Cancel")
                 }
-            ) {
-                Text("Salvar")
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                Button(
+                    onClick = {
+                        newTripViewModel.saveTrip(
+                            id = tripId ?: 0,
+                            onSuccess = {
+                                Toast.makeText(
+                                    context,
+                                    "Trip saved successfully!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                onNavigateTo(AppRouter.MENU.route)
+                            },
+                            onError = {
+                                Toast.makeText(
+                                    context,
+                                    "Please fill all the fields correctly!",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        )
+                    }
+                ) {
+                    Text("Save")
+                }
             }
         }
     }
 }
 
 @Composable
-fun TripTypeSelector(selectedType: String, onTypeChange: (String) -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text(text = "Trip Type:")
-        RadioButtonWithLabel("Lazer", selectedType, onTypeChange)
-        RadioButtonWithLabel("Trabalho", selectedType, onTypeChange)
+fun TripTypeSelector(selectedType: TripType, onTypeChange: (TripType) -> Unit) {
+    Row {
+        RadioButton(
+            selected = selectedType == TripType.LEISURE,
+            onClick = { onTypeChange(TripType.LEISURE) }
+        )
+        Text("Leisure")
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        RadioButton(
+            selected = selectedType == TripType.WORK,
+            onClick = { onTypeChange(TripType.WORK) }
+        )
+        Text("Work")
     }
 }
 

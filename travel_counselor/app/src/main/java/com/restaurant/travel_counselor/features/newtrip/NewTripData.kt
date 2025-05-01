@@ -1,8 +1,9 @@
 package com.restaurant.travel_counselor.features.newtrip
 
+
 data class NewTripData(
     val destination: String = "",
-    val tripType: String = "Lazer",
+    val tripType: TripType = TripType.LEISURE,
     val startDate: String = "",
     val endDate: String = "",
     val budget: Double = 0.0

@@ -29,9 +29,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.restaurant.travel_counselor.database.AppDatabase
-import com.restaurant.travel_counselor.features.register.RegisterUserViewModelFactory
 import com.restaurant.travel_counselor.shared.components.ErrorDialog
 import com.restaurant.travel_counselor.shared.components.MyPasswordField
+import com.restaurant.travel_counselor.shared.enums.AppRouter
 import kotlinx.coroutines.launch
 
 @Composable
@@ -85,7 +85,7 @@ fun LoginFields(loginViewModel: LoginViewModel, onNavigateTo: (String) -> Unit) 
                     val isValidUser = loginViewModel.checkCredentials()
                     if (isValidUser) {
                         Toast.makeText(ctx, "Login successful", Toast.LENGTH_SHORT).show()
-                        onNavigateTo("MenuScreen")
+                        onNavigateTo(AppRouter.MENU.route)
                     } else {
                         Toast.makeText(ctx, "Invalid username or password", Toast.LENGTH_SHORT)
                             .show()
