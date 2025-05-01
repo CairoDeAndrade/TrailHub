@@ -47,7 +47,7 @@ class NewTripViewModel(
         _uiState.value = _uiState.value.copy(endDate = newEndDate)
     }
 
-    fun onBudgetChange(newBudget: String) {
+    fun onBudgetChange(newBudget: Double) {
         _uiState.value = _uiState.value.copy(budget = newBudget)
     }
 
@@ -59,14 +59,12 @@ class NewTripViewModel(
             return
         }
 
-        val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-
         val trip = Trip(
             id = id,
             destination = tripData.destination,
             tripType = tripData.tripType,
-            startDate = LocalDate.parse(tripData.startDate, formatter),
-            endDate = LocalDate.parse(tripData.endDate, formatter),
+            startDate = LocalDate.parse(tripData.startDate, uiFormatter),
+            endDate = LocalDate.parse(tripData.endDate, uiFormatter),
             budget = tripData.budget
         )
 

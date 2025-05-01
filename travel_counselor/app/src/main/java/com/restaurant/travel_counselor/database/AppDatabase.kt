@@ -1,6 +1,8 @@
 package com.restaurant.travel_counselor.database
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -15,7 +17,7 @@ import com.restaurant.travel_counselor.shared.utils.Converters
 
 @Database(
     entities = [User::class, Trip::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -28,9 +30,8 @@ abstract class AppDatabase : RoomDatabase() {
         @Volatile
         private var Instance: AppDatabase? = null
 
-        private val MIGRATION_1_2 = object : Migration(1, 2) {
+        private val V2_CREATING_TABLES_USER_AND_TRIP = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Criação da tabela User
                 db.execSQL(
                     """
                             CREATE TABLE IF NOT EXISTS User (
@@ -42,7 +43,6 @@ abstract class AppDatabase : RoomDatabase() {
                         """
                 )
 
-                // Inserção do usuário 'teste'
                 db.execSQL(
                     """
                             INSERT INTO User (name, password, email) 
@@ -50,7 +50,6 @@ abstract class AppDatabase : RoomDatabase() {
                         """
                 )
 
-                // Criação da tabela Trip
                 db.execSQL(
                     """
                         CREATE TABLE IF NOT EXISTS Trip (
@@ -66,6 +65,35 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        private val V3_ALTER_DATE_FIELDS = object : Migration(2, 3) {
+            @RequiresApi(Build.VERSION_CODES.O)
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL("DROP TABLE IF EXISTS Trip")
+
+                db.execSQL(
+                    """
+            CREATE TABLE trip (
+                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                destination TEXT NOT NULL,
+                tripType TEXT NOT NULL,
+                startDate INTEGER NOT NULL,
+                endDate INTEGER NOT NULL,
+                budget REAL NOT NULL
+            )
+            """
+                )
+
+                val startEpochDay = java.time.LocalDate.of(2025, 5, 1).toEpochDay()
+                val endEpochDay = java.time.LocalDate.of(2025, 5, 5).toEpochDay()
+                val insertMockTrip = """
+            INSERT INTO trip (destination, tripType, startDate, endDate, budget)
+            VALUES ('Paris', 'Lazer', $startEpochDay, $endEpochDay, 3500.0)
+        """
+                db.execSQL(insertMockTrip)
+            }
+        }
+
+
         fun getDatabase(context: Context): AppDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(
@@ -73,7 +101,10 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "travel_counselor_database"
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(
+                        V2_CREATING_TABLES_USER_AND_TRIP,
+                        V3_ALTER_DATE_FIELDS
+                    )
                     .build().also { Instance = it }
             }
         }

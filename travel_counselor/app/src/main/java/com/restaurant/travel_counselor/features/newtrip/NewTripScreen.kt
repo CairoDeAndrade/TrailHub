@@ -97,8 +97,11 @@ fun NewTripScreen(onNavigateTo: (String) -> Unit, tripId: Int?) {
 
             RequiredNumberField(
                 label = "Budget (R$)",
-                value = uiState.value.budget,
-                onValueChange = newTripViewModel::onBudgetChange
+                value = uiState.value.budget.toString(),
+                onValueChange = { input ->
+                    val budget = input.toDoubleOrNull() ?: 0.0
+                    newTripViewModel.onBudgetChange(budget)
+                }
             )
 
             Button(
