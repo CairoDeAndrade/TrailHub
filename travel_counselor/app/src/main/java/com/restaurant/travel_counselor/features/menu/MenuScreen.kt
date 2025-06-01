@@ -1,6 +1,8 @@
 package com.restaurant.travel_counselor.features.menu
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
@@ -37,6 +39,7 @@ import com.restaurant.travel_counselor.features.newtrip.TripCard
 import com.restaurant.travel_counselor.shared.enums.BottomBarRouter
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MenuScreen(navController: NavHostController, function: () -> Unit) {
     val context = LocalContext.current
@@ -112,9 +115,16 @@ fun MenuScreen(navController: NavHostController, function: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             items(tripList) { trip ->
-                TripCard(trip = trip) {
-                    navController.navigate("new_trip/${trip.id}")
-                }
+                TripCard(
+                    trip = trip,
+                    onClick = {
+                        navController.navigate("new_trip/${trip.id}")
+                    },
+                    onItineraryClick = {
+                        navController.navigate("itinerary/${trip.id}")
+                    }
+                )
+
             }
         }
     }
@@ -122,6 +132,7 @@ fun MenuScreen(navController: NavHostController, function: () -> Unit) {
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun PreviewMenuScreen() {

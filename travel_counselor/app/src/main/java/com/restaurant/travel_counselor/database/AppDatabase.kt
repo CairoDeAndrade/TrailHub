@@ -17,7 +17,7 @@ import com.restaurant.travel_counselor.shared.utils.Converters
 
 @Database(
     entities = [User::class, Trip::class],
-    version = 4,
+    version = 7,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -72,16 +72,17 @@ abstract class AppDatabase : RoomDatabase() {
 
                 db.execSQL(
                     """
-            CREATE TABLE trip (
-                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                destination TEXT NOT NULL,
-                tripType TEXT NOT NULL,
-                startDate INTEGER NOT NULL,
-                endDate INTEGER NOT NULL,
-                budget REAL NOT NULL
-            )
-            """
-                )
+                            CREATE TABLE trip (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                destination TEXT NOT NULL,
+                                tripType TEXT NOT NULL,
+                                startDate INTEGER NOT NULL,
+                                endDate INTEGER NOT NULL,
+                                budget REAL NOT NULL,
+                                notes TEXT
+                            )
+                        """)
+
 
                 val startEpochDay = java.time.LocalDate.of(2025, 5, 1).toEpochDay()
                 val endEpochDay = java.time.LocalDate.of(2025, 5, 5).toEpochDay()
@@ -101,11 +102,8 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "travel_counselor_database"
                 )
-                    .addMigrations(
-                        V2_CREATING_TABLES_USER_AND_TRIP,
-                        V3_ALTER_DATE_FIELDS
-                    )
-                    .build().also { Instance = it }
+                    .fallbackToDestructiveMigration()
+                    .build()
             }
         }
     }

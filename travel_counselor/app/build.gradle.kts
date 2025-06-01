@@ -17,6 +17,14 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val geminiApiKey = rootProject.file("local.properties")
+            .readLines()
+            .find { it.startsWith("GEMINI_API_KEY=") }
+            ?.substringAfter("=")
+            ?: ""
+
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiApiKey\"")
     }
 
     buildTypes {
@@ -36,6 +44,7 @@ android {
         jvmTarget = "11"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
@@ -43,7 +52,6 @@ android {
 dependencies {
     val nav_version = "2.8.9"
     val lifecycle_version = "2.8.7"
-    val arch_version = "2.2.0"
     val ComposeMaterial = "1.7.8"
 
     val room_version = "2.6.1"
@@ -68,6 +76,14 @@ dependencies {
     // Room
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
+
+    // Gemini
+    implementation("com.google.ai.client.generativeai:generativeai:0.2.1")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

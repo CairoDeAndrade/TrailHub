@@ -1,9 +1,11 @@
 package com.restaurant.travel_counselor
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -12,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.restaurant.travel_counselor.features.itnerary.ItinerarySuggestionScreen
 import com.restaurant.travel_counselor.features.login.LoginScreen
 import com.restaurant.travel_counselor.features.menu.MenuScreen
 import com.restaurant.travel_counselor.features.newtrip.NewTripScreen
@@ -21,6 +24,7 @@ import com.restaurant.travel_counselor.shared.enums.AppRouter
 import com.restaurant.travel_counselor.ui.theme.Travel_counselorTheme
 
 class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -40,13 +44,13 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun Boot() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = AppRouter.LOGIN.route
-    ) {
+        startDestination = AppRouter.MENU.route    ) {
         composable(route = AppRouter.LOGIN.route) {
             LoginScreen(onNavigateTo = {
                 navController.navigate(it)
@@ -74,6 +78,16 @@ fun Boot() {
             val tripId = backStackEntry.arguments?.getString("tripId")?.toIntOrNull()
             if (tripId != null) {
                 NewTripScreen(onNavigateTo = { navController.navigate(it) }, tripId = tripId)
+            }
+        }
+
+        composable("itinerary/{tripId}") { backStackEntry ->
+            val tripId = backStackEntry.arguments?.getString("tripId")?.toIntOrNull()
+            if (tripId != null) {
+                ItinerarySuggestionScreen(
+                    tripId = tripId,
+                    onNavigateTo = { navController.navigate(it) }
+                )
             }
         }
 

@@ -18,7 +18,11 @@ import com.restaurant.travel_counselor.shared.utils.DateUtils
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun TripCard(trip: Trip, onClick: () -> Unit) {
+fun TripCard(
+    trip: Trip,
+    onClick: () -> Unit,
+    onItineraryClick: () -> Unit = {}
+) {
     Card(
         modifier = Modifier
             .padding(vertical = 8.dp)
@@ -33,6 +37,15 @@ fun TripCard(trip: Trip, onClick: () -> Unit) {
             Text(text = "Start Date: ${DateUtils.formatDate(trip.startDate)}")
             Text(text = "End Date: ${DateUtils.formatDate(trip.endDate)}")
             Text(text = "Budget: R$ ${"%.2f".format(trip.budget)}")
+
+            androidx.compose.material3.Button(
+                onClick = { onItineraryClick() },
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = "Itinerary")
+            }
         }
     }
 }
