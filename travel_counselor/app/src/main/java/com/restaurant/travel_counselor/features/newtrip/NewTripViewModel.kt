@@ -24,7 +24,8 @@ class NewTripViewModel(
     private val _uiState = MutableStateFlow(NewTripData())
     val uiState: StateFlow<NewTripData> = _uiState
 
-    val tripList: StateFlow<List<Trip>> = tripDao.findAll()
+
+    val tripList: StateFlow<List<Trip>> = tripDao.findActiveTrips()
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
@@ -93,4 +94,11 @@ class NewTripViewModel(
             }
         }
     }
+
+    fun softDeleteTrip(id: Int) {
+        viewModelScope.launch {
+            tripDao.softDeleteTripById(id)
+        }
+    }
+
 }

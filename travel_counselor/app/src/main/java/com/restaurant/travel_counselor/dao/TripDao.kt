@@ -28,4 +28,11 @@ interface TripDao {
 
     @Query("SELECT * FROM Trip ORDER BY startDate DESC")
     fun findAll(): Flow<List<Trip>>
+
+    @Query("SELECT * FROM Trip WHERE active = 1 ORDER BY startDate DESC")
+    fun findActiveTrips(): Flow<List<Trip>>
+
+    @Query("UPDATE Trip SET active = 0 WHERE id = :id")
+    suspend fun softDeleteTripById(id: Int)
 }
+

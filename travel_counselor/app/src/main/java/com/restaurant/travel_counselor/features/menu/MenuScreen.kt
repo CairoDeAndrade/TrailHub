@@ -1,26 +1,14 @@
 package com.restaurant.travel_counselor.features.menu
 
-
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,7 +26,6 @@ import com.restaurant.travel_counselor.features.newtrip.NewTripViewModelFactory
 import com.restaurant.travel_counselor.features.newtrip.TripCard
 import com.restaurant.travel_counselor.shared.enums.BottomBarRouter
 
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun MenuScreen(navController: NavHostController, function: () -> Unit) {
@@ -47,6 +34,9 @@ fun MenuScreen(navController: NavHostController, function: () -> Unit) {
     val factory = NewTripViewModelFactory(tripDao)
     val viewModel: NewTripViewModel = viewModel(factory = factory)
     val tripList by viewModel.tripList.collectAsState()
+
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedTripId by remember { mutableStateOf<Int?>(null) }
 
     Scaffold(
         bottomBar = {
@@ -69,7 +59,7 @@ fun MenuScreen(navController: NavHostController, function: () -> Unit) {
                         },
                         icon = {
                             if (isSelected) {
-                                androidx.compose.material3.Icon(
+                                Icon(
                                     imageVector = screen.icon,
                                     contentDescription = screen.label,
                                     tint = MaterialTheme.colorScheme.onPrimary,
@@ -105,10 +95,10 @@ fun MenuScreen(navController: NavHostController, function: () -> Unit) {
                 }
             }
         }
-    ) {
+    ) { padding ->
         LazyColumn(
             modifier = Modifier
-                .padding(it)
+                .padding(padding)
                 .padding(horizontal = 16.dp)
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Top,
@@ -117,20 +107,47 @@ fun MenuScreen(navController: NavHostController, function: () -> Unit) {
             items(tripList) { trip ->
                 TripCard(
                     trip = trip,
-                    onClick = {
+                    onEditClick = {
                         navController.navigate("new_trip/${trip.id}")
                     },
                     onItineraryClick = {
                         navController.navigate("itinerary/${trip.id}")
+                    },
+                    onDeleteClick = {
+                        selectedTripId = trip.id
+                        showDialog = true
                     }
                 )
-
             }
+        }
+
+        // Diálogo de confirmação
+        if (showDialog && selectedTripId != null) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Confirmar exclusão") },
+                text = { Text("Deseja realmente excluir esta viagem?") },
+                confirmButton = {
+                    TextButton(onClick = {
+                        viewModel.softDeleteTrip(selectedTripId!!)
+                        showDialog = false
+                        selectedTripId = null
+                    }) {
+                        Text("Sim")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = {
+                        showDialog = false
+                        selectedTripId = null
+                    }) {
+                        Text("Cancelar")
+                    }
+                }
+            )
         }
     }
 }
-
-
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)

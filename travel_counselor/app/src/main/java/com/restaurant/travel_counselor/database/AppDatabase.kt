@@ -17,7 +17,7 @@ import com.restaurant.travel_counselor.shared.utils.Converters
 
 @Database(
     entities = [User::class, Trip::class],
-    version = 7,
+    version = 8,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

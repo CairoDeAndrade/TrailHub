@@ -50,7 +50,7 @@ fun Boot() {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = AppRouter.MENU.route    ) {
+        startDestination = AppRouter.LOGIN.route    ) {
         composable(route = AppRouter.LOGIN.route) {
             LoginScreen(onNavigateTo = {
                 navController.navigate(it)
